@@ -1,27 +1,30 @@
-package com.dsr.proxy_server.model;
+package com.dsr.proxy_server.data.entity;
 
-import com.dsr.proxy_server.model.enums.ProxyAnonymity;
-import com.dsr.proxy_server.model.enums.YesNoAny;
+import com.dsr.proxy_server.data.enums.ProxyAnonymity;
+import com.dsr.proxy_server.data.enums.YesNoAny;
 
+import javax.persistence.*;
 import java.util.Objects;
 
-public class ProxyResultItem {
+@Entity
+@Table(name = "proxy_servers", schema = "public")
+public class ProxyServer {
 
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Integer proxyServerId;
     private String ip;
     private Integer port;
     private Integer type;
+    @Column(columnDefinition = "VARCHAR")
     private ProxyAnonymity anonymity;
     private Double uptime;
-    private CountryResult country;
+    @Column(columnDefinition = "VARCHAR")
     private YesNoAny available;
 
-    public YesNoAny getAvailable() {
-        return available;
-    }
-
-    public void setAvailable(YesNoAny available) {
-        this.available = available;
-    }
+    @ManyToOne
+    @JoinColumn(name = "country_id")
+    private Country country;
 
     public String getIp() {
         return ip;
@@ -63,11 +66,19 @@ public class ProxyResultItem {
         this.uptime = uptime;
     }
 
-    public CountryResult getCountry() {
+    public YesNoAny getAvailable() {
+        return available;
+    }
+
+    public void setAvailable(YesNoAny available) {
+        this.available = available;
+    }
+
+    public Country getCountry() {
         return country;
     }
 
-    public void setCountry(CountryResult country) {
+    public void setCountry(Country country) {
         this.country = country;
     }
 
@@ -75,31 +86,32 @@ public class ProxyResultItem {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        ProxyResultItem that = (ProxyResultItem) o;
+        ProxyServer that = (ProxyServer) o;
         return Objects.equals(ip, that.ip) &&
                 Objects.equals(port, that.port) &&
                 Objects.equals(type, that.type) &&
                 anonymity == that.anonymity &&
                 Objects.equals(uptime, that.uptime) &&
-                Objects.equals(country, that.country) &&
-                available == that.available;
+                available == that.available &&
+                Objects.equals(country, that.country);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(ip, port, type, anonymity, uptime, country, available);
+        return Objects.hash(ip, port, type, anonymity, uptime, available, country);
     }
 
     @Override
     public String toString() {
-        return "ProxyResultItem{" +
-                "ip='" + ip + '\'' +
+        return "ProxyServer{" +
+                "proxyServerId=" + proxyServerId +
+                ", ip='" + ip + '\'' +
                 ", port=" + port +
                 ", type=" + type +
                 ", anonymity=" + anonymity +
                 ", uptime=" + uptime +
-                ", country=" + country +
                 ", available=" + available +
+                ", country=" + country +
                 '}';
     }
 }

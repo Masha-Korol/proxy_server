@@ -1,4 +1,4 @@
-package com.dsr.proxy_server.model.enums;
+package com.dsr.proxy_server.data.enums;
 
 public enum YesNoAny {
 

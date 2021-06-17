@@ -1,6 +1,6 @@
 package com.dsr.proxy_server.controller;
 
-import com.dsr.proxy_server.model.ProxyServerResponseEntity;
+import com.dsr.proxy_server.data.dto.ProxyServerResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
