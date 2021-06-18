@@ -1,4 +1,4 @@
-package com.dsr.proxy_server.data.dto;
+package com.dsr.proxy_server.data.dto.ProxyServersResponse;
 
 import java.io.Serializable;
 import java.util.*;

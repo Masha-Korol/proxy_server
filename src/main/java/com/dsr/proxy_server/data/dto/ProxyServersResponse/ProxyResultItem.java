@@ -1,4 +1,4 @@
-package com.dsr.proxy_server.data.dto;
+package com.dsr.proxy_server.data.dto.ProxyServersResponse;
 
 import com.dsr.proxy_server.data.enums.ProxyAnonymity;
 import com.dsr.proxy_server.data.enums.YesNoAny;

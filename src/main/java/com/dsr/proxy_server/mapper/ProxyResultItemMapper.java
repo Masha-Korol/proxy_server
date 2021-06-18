@@ -1,6 +1,6 @@
 package com.dsr.proxy_server.mapper;
 
-import com.dsr.proxy_server.data.dto.ProxyResultItem;
+import com.dsr.proxy_server.data.dto.ProxyServersResponse.ProxyResultItem;
 import com.dsr.proxy_server.data.entity.ProxyServer;
 import com.dsr.proxy_server.repositories.CountryRepository;
 import org.mapstruct.Mapper;

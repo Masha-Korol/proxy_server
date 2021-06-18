@@ -5,4 +5,5 @@ import org.springframework.data.repository.PagingAndSortingRepository;
 
 public interface CountryRepository extends PagingAndSortingRepository<Country, Integer> {
     Country findByNameEn(String nameEn);
+    boolean existsByNameEn(String nameEn);
 }
