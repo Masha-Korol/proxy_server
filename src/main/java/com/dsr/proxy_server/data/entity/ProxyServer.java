@@ -1,6 +1,7 @@
 package com.dsr.proxy_server.data.entity;
 
 import com.dsr.proxy_server.data.enums.ProxyAnonymity;
+import com.dsr.proxy_server.data.enums.ProxyProtocol;
 import com.dsr.proxy_server.data.enums.YesNoAny;
 
 import javax.persistence.*;
@@ -15,7 +16,8 @@ public class ProxyServer {
     private Integer proxyServerId;
     private String ip;
     private Integer port;
-    private Integer type;
+    @Column(columnDefinition = "VARCHAR")
+    private ProxyProtocol type;
     @Column(columnDefinition = "VARCHAR")
     private ProxyAnonymity anonymity;
     private Double uptime;
@@ -42,11 +44,11 @@ public class ProxyServer {
         this.port = port;
     }
 
-    public Integer getType() {
+    public ProxyProtocol getType() {
         return type;
     }
 
-    public void setType(Integer type) {
+    public void setType(ProxyProtocol type) {
         this.type = type;
     }
 

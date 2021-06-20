@@ -1,6 +1,9 @@
 package com.dsr.proxy_server.thread;
 
-import com.dsr.proxy_server.service.ProxyServerService;
+import com.dsr.proxy_server.service.CountryService;
+import com.dsr.proxy_server.service.ProxyServersManagerService;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
@@ -9,10 +12,11 @@ import org.springframework.stereotype.Component;
 public class ServersCheckThread implements Runnable {
 
     public static Integer checkServersTimeInterval = 10000;
-    private final ProxyServerService proxyServerService;
+    private final ProxyServersManagerService proxyServersManagerService;
+    private static final Logger logger = LogManager.getLogger(ServersCheckThread.class);
 
-    public ServersCheckThread(ProxyServerService proxyServerService) {
-        this.proxyServerService = proxyServerService;
+    public ServersCheckThread(ProxyServersManagerService proxyServersManagerService) {
+        this.proxyServersManagerService = proxyServersManagerService;
     }
 
     @Override
@@ -23,12 +27,12 @@ public class ServersCheckThread implements Runnable {
     }
 
     private synchronized void checkAllServers() {
-        System.out.println("checks threads");
-        System.out.println("timing = " + checkServersTimeInterval + " millis");
-        // thread gets servers from source then sleeps for a certain amount of time
-        proxyServerService.checkAllServers();
+        logger.info("checks threads");
+        // thread gets servers from source
+        // then sleeps for a certain amount of time (checkServersTimeInterval variable)
+        proxyServersManagerService.checkAllServers();
         try {
-            System.out.println("waiting");
+            logger.info("waiting for " + checkServersTimeInterval + " millis");
             wait(checkServersTimeInterval);
         } catch (InterruptedException e) {
             e.printStackTrace();

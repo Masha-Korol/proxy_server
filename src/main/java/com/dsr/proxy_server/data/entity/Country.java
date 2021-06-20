@@ -12,6 +12,12 @@ public class Country {
     private Integer countryId;
     private String nameEn;
 
+    public Country(String nameEn) {
+        this.nameEn = nameEn;
+    }
+
+    public Country(){}
+
     public Integer getCountryId() {
         return countryId;
     }

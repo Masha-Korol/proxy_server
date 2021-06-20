@@ -8,6 +8,12 @@ public class ProxyServerResponse {
     private Integer statusCode;
     private String responseBody;
 
+    public ProxyServerResponse(String ip, Integer statusCode, String responseBody) {
+        this.ip = ip;
+        this.statusCode = statusCode;
+        this.responseBody = responseBody;
+    }
+
     public String getIp() {
         return ip;
     }

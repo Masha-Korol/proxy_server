@@ -1,9 +1,7 @@
 package com.dsr.proxy_server.data.dto.proxy;
 
-import com.dsr.proxy_server.data.entity.Country;
 import com.dsr.proxy_server.data.enums.ContentType;
 import com.dsr.proxy_server.data.enums.Method;
-
 import java.util.Objects;
 
 public class ProxyServerRequest {

@@ -1,7 +1,7 @@
 package com.dsr.proxy_server.controller;
 
 import com.dsr.proxy_server.data.dto.ChangeServersCheckTimingRequest;
-import com.dsr.proxy_server.service.ProxyServerService;
+import com.dsr.proxy_server.service.ProxyServersManagerService;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -9,14 +9,14 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping(path = "/api/v1/servers")
 public class ProxyServersController {
 
-    private final ProxyServerService proxyServerService;
+    private final ProxyServersManagerService proxyServersManagerService;
 
-    public ProxyServersController(ProxyServerService proxyServerService) {
-        this.proxyServerService = proxyServerService;
+    public ProxyServersController(ProxyServersManagerService proxyServersManagerService) {
+        this.proxyServersManagerService = proxyServersManagerService;
     }
 
     @PostMapping("/timing")
     public void changeServersCheckTiming(@RequestBody ChangeServersCheckTimingRequest request){
-        proxyServerService.changeServersCheckTiming(request);
+        proxyServersManagerService.changeServersCheckTiming(request);
     }
 }

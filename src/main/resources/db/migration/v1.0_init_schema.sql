@@ -1,12 +1,12 @@
 CREATE TABLE "proxy_servers" (
 "proxy_server_id" serial NOT NULL,
 "ip" varchar(255) NOT NULL,
-"port" integer NOT NULL,
-"type" integer NOT NULL,
-"anonymity" varchar(255) NOT NULL,
-"uptime" FLOAT NOT NULL,
-"available" varchar(255) NOT NULL,
-"country_id" integer NOT NULL,
+"port" integer,
+"type" integer NOT NULL default 15,
+"anonymity" varchar(255) NOT NULL default 'All',
+"uptime" FLOAT,
+"available" varchar(255) NOT NULL default 'Yes',
+"country_id" integer,
 CONSTRAINT "proxy_servers_pk" PRIMARY KEY ("proxy_server_id")
 );
 
