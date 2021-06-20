@@ -2,6 +2,9 @@ package com.dsr.proxy_server.data.dto.proxy;
 
 import java.util.Objects;
 
+/**
+ * This class represents response for user's request
+ */
 public class ProxyServerResponse {
 
     private String ip;

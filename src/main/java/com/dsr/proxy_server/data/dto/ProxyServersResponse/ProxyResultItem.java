@@ -5,6 +5,9 @@ import com.dsr.proxy_server.data.enums.YesNoAny;
 
 import java.util.Objects;
 
+/**
+ * This class represents an entity of proxy server, that's included in the Response
+ */
 public class ProxyResultItem {
 
     private String ip;

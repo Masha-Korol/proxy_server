@@ -13,9 +13,13 @@ import org.apache.logging.log4j.Logger;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
-
 import java.util.List;
 
+/**
+ * This class contains the logic that's connected with proxy servers checking:
+ * adding and deleting them from db;
+ * work with threads
+ */
 @Service
 public class ProxyServersManagerService {
 
@@ -75,7 +79,7 @@ public class ProxyServersManagerService {
     /**
      * This method gets info about all proxy servers from http://api.foxtools.ru/v2/Proxy
      *
-     * @return - entity of type ProxyServerResponseEntity
+     * @return entity of type ProxyServerResponseEntity
      */
     private ProxyServerResponseEntity getAllServers() {
         ProxyServerResponseEntity proxyServerResponseEntity =
@@ -86,7 +90,7 @@ public class ProxyServersManagerService {
     /**
      * This method changes servers' check time interval
      *
-     * @param request - entity of type ChangeServersCheckTimingRequest
+     * @param request entity of type ChangeServersCheckTimingRequest
      */
     public void changeServersCheckTiming(ChangeServersCheckTimingRequest request) {
         Integer intervalInMillis = null;

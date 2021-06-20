@@ -11,10 +11,11 @@ import com.dsr.proxy_server.repositories.ProxyServerRepository;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
 import java.util.*;
-import java.util.stream.Collectors;
 
+/**
+ * This class contains the logic that's connected with users' requests
+ */
 @Service
 public class ProxyRequestService {
 

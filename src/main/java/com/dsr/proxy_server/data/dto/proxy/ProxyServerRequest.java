@@ -4,6 +4,9 @@ import com.dsr.proxy_server.data.enums.ContentType;
 import com.dsr.proxy_server.data.enums.Method;
 import java.util.Objects;
 
+/**
+ * This class represents users' requests
+ */
 public class ProxyServerRequest {
 
     private String country;

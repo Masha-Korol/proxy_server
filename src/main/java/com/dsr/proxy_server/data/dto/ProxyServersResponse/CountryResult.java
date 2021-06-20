@@ -2,6 +2,9 @@ package com.dsr.proxy_server.data.dto.ProxyServersResponse;
 
 import java.util.Objects;
 
+/**
+ * This class represents an entity of country, that's included in the ProxyResultItem
+ */
 public class CountryResult {
 
     private String nameEn;

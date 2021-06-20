@@ -3,6 +3,9 @@ package com.dsr.proxy_server.data.entity;
 import javax.persistence.*;
 import java.util.Objects;
 
+/**
+ * This class represents the entity of country, that's stored in the database
+ */
 @Entity
 @Table(name = "countries", schema = "public")
 public class Country {

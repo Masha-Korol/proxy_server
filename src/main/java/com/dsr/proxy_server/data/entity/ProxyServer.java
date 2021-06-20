@@ -7,6 +7,9 @@ import com.dsr.proxy_server.data.enums.YesNoAny;
 import javax.persistence.*;
 import java.util.Objects;
 
+/**
+ * This class represents the entity of proxy server, that's stored in the database
+ */
 @Entity
 @Table(name = "proxy_servers", schema = "public")
 public class ProxyServer {

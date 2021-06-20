@@ -7,10 +7,18 @@ import org.apache.logging.log4j.Logger;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
+/**
+ * This thread checks all the proxy servers, adds available ones, if they're not in the db,
+ * and deletes  unavailable ones
+ */
 @Component("thread")
 @Scope("prototype")
 public class ServersCheckThread implements Runnable {
 
+    /**
+     * This variable contains the amount of milliseconds - the time, during which this thread is sleeping
+     * before next servers check
+     */
     public static Integer checkServersTimeInterval = 10000;
     private final ProxyServersManagerService proxyServersManagerService;
     private static final Logger logger = LogManager.getLogger(ServersCheckThread.class);

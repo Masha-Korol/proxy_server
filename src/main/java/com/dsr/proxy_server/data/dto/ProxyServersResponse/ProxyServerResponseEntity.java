@@ -2,6 +2,9 @@ package com.dsr.proxy_server.data.dto.ProxyServersResponse;
 
 import java.util.Objects;
 
+/**
+ * This class represents an This class represents the response from http://api.foxtools.ru/v2/Proxy
+ */
 public class ProxyServerResponseEntity {
 
     private Response response;

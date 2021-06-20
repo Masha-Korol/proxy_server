@@ -3,6 +3,9 @@ package com.dsr.proxy_server.data.dto.ProxyServersResponse;
 import java.io.Serializable;
 import java.util.*;
 
+/**
+ * This class represents the response, that's included in the ProxyServerResponseEntity
+ */
 public class Response implements Serializable {
 
     private Integer pageNumber;

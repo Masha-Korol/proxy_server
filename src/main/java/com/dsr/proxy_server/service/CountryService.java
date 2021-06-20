@@ -7,6 +7,9 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.stereotype.Service;
 
+/**
+ * This class contains the logic that's connected with countries
+ */
 @Service
 public class CountryService {
 
@@ -20,7 +23,7 @@ public class CountryService {
     /**
      * This method add country to the database if it's not there yet
      *
-     * @param countryResult - entity of type CountryResult
+     * @param countryResult entity of type CountryResult
      */
     public void add(CountryResult countryResult) {
         if (!countryRepository.existsByNameEn(countryResult.getNameEn())) {

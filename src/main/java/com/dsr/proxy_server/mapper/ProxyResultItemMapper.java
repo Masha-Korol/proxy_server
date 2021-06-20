@@ -9,6 +9,9 @@ import org.mapstruct.Mapping;
 import org.mapstruct.Mappings;
 import org.springframework.beans.factory.annotation.Autowired;
 
+/**
+ * This class is mapper that converts the entity of ProxyServer to the entity of ProxyResultItem and back
+ */
 @Mapper(componentModel = "spring", imports = ProxyProtocol.class)
 public abstract class ProxyResultItemMapper extends BaseMapper<ProxyServer, ProxyResultItem> {
 
@@ -27,6 +30,12 @@ public abstract class ProxyResultItemMapper extends BaseMapper<ProxyServer, Prox
             expression = "java(mapTypeVariableToInteger(entity.getType()))")
     public abstract ProxyResultItem toDto(ProxyServer entity);
 
+    /**
+     * This class is used to map the entity of type Integer to the entity of type ProxyProtocol
+     * for converting the entity of ProxyResultItem to the entity of ProxyServer
+     * @param value value of Integer
+     * @return value of ProxyProtocol
+     */
     protected ProxyProtocol mapTypeVariableToEnum(Integer value) {
         switch (value) {
             case 0:
@@ -45,6 +54,12 @@ public abstract class ProxyResultItemMapper extends BaseMapper<ProxyServer, Prox
         return null;
     }
 
+    /**
+     * This class is used to map the entity of type ProxyProtocol to the entity of type Integer
+     * for converting the entity of ProxyServer to the entity of ProxyResultItem
+     * @param enumValue value of ProxyProtocol
+     * @return value of Integer
+     */
     protected Integer mapTypeVariableToInteger(ProxyProtocol enumValue) {
         switch (enumValue) {
             case None:

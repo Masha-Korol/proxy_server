@@ -4,6 +4,9 @@ import com.dsr.proxy_server.data.enums.TimeUnit;
 
 import java.util.Objects;
 
+/**
+ * This class represents request, that somebody sends to change the servers check time interval
+ */
 public class ChangeServersCheckTimingRequest {
 
     private TimeUnit timeUnit;
