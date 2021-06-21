@@ -17,7 +17,7 @@ public class ServersCheckThread implements Runnable {
 
     /**
      * This variable contains the amount of milliseconds - the time, during which this thread is sleeping
-     * before next servers check
+     * before next servers' check
      */
     public static Integer checkServersTimeInterval = 10000;
     private final ProxyServersManagerService proxyServersManagerService;
@@ -34,6 +34,9 @@ public class ServersCheckThread implements Runnable {
         }
     }
 
+    /**
+     * This method calls method, that checks all the servers (adds and deletes them if needed), then sleeps for a certain amount of time
+     */
     private synchronized void checkAllServers() {
         logger.info("checks threads");
         // thread gets servers from source

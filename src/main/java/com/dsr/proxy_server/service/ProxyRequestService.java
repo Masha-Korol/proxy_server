@@ -6,9 +6,11 @@ import com.dsr.proxy_server.data.entity.Country;
 import com.dsr.proxy_server.data.entity.ProxyServer;
 import com.dsr.proxy_server.data.enums.ContentType;
 import com.dsr.proxy_server.data.enums.Method;
+import com.dsr.proxy_server.data.enums.ProxyAnonymity;
+import com.dsr.proxy_server.data.enums.ProxyServersSortingCriterion;
 import com.dsr.proxy_server.repositories.CountryRepository;
 import com.dsr.proxy_server.repositories.ProxyServerRepository;
-import org.springframework.data.domain.Sort;
+import com.dsr.proxy_server.sorting.MergeSorter;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import java.util.*;
@@ -21,15 +23,16 @@ public class ProxyRequestService {
 
     private final ProxyServerRepository proxyServerRepository;
     private final CountryRepository countryRepository;
+    private final MergeSorter mergeSorter;
 
-    public ProxyRequestService(ProxyServerRepository proxyServerRepository, CountryRepository countryRepository) {
+    public ProxyRequestService(ProxyServerRepository proxyServerRepository, CountryRepository countryRepository, MergeSorter mergeSorter) {
         this.proxyServerRepository = proxyServerRepository;
         this.countryRepository = countryRepository;
+        this.mergeSorter = mergeSorter;
     }
 
     /**
      * This method directs coming requests to proxy servers based on preferable country.
-     * Request for all the servers is made with the help of spring data jpa sorting.
      * Sorting is executed by fields:
      * anonymity (the higher the better);
      * uptime (the less the better).
@@ -47,15 +50,42 @@ public class ProxyRequestService {
         }
 
         Country country = countryRepository.findByNameEn(request.getCountry());
-        List<ProxyServer> proxyServers = proxyServerRepository.findAllByCountry(country, Sort.by("uptime"));
+        List<ProxyServer> proxyServers = proxyServerRepository.findAllByCountry(country);
         // request's country validation
         if (proxyServers.size() == 0) {
             return new ProxyServerResponse(null, 400,
                     "Bad Request. There's no available proxy servers in " + request.getCountry());
         }
-        // if success
-        return new ProxyServerResponse(proxyServers.get(0).getIp(), 200,
+        ProxyServer proxyServer = getTheBestProxyServerOfAll(proxyServers);
+        return new ProxyServerResponse(proxyServer.getIp(), 200,
                 "OK. Your request has been successfully sent to proxy with ip " + proxyServers.get(0).getIp());
+    }
+
+    /**
+     * This method sorts all the proxy servers by anonymity and uptime, then returns the best result
+     *
+     * @param proxyServers list of all proxy servers
+     * @return the most suitable proxy server
+     */
+    private ProxyServer getTheBestProxyServerOfAll(List<ProxyServer> proxyServers) {
+        // sort all the results by anonymity level
+        ProxyServer[] proxyServersForSorting = proxyServers.toArray(new ProxyServer[proxyServers.size()]);
+        mergeSorter.sort(proxyServersForSorting, proxyServers.size(), ProxyServersSortingCriterion.ANONYMITY);
+        // define the number of proxy servers with the highest anonymity level (i variable)
+        ProxyAnonymity theBestAnonymity = proxyServersForSorting[0].getAnonymity();
+        int i = 0;
+        ProxyServer proxyServer;
+        do {
+            if (proxyServersForSorting.length > i) {
+                proxyServer = proxyServersForSorting[i];
+                i++;
+            } else {
+                break;
+            }
+        } while (proxyServer.getAnonymity().equals(theBestAnonymity));
+        // sort by uptime only servers with the best anonymity level
+        mergeSorter.sort(proxyServersForSorting, i - 1, ProxyServersSortingCriterion.UPTIME);
+        return proxyServersForSorting[0];
     }
 
     /**
