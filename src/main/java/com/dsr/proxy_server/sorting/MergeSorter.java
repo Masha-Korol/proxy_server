@@ -17,29 +17,33 @@ public class MergeSorter {
 
     /**
      * This method compares two entities of ProxyServer, based on criterion
+     *
      * @param proxyServer1 the first prosy server
      * @param proxyServer2 the second proxy server
-     * @param criterion criterion, by which the sorting should be done
+     * @param criterion    criterion, by which the sorting should be done
      * @return boolean result
      */
     private boolean compare(ProxyServer proxyServer1,
                             ProxyServer proxyServer2,
                             ProxyServersSortingCriterion criterion) {
-        switch (criterion){
+        switch (criterion) {
             case UPTIME:
                 return proxyServer1.getUptime() > proxyServer2.getUptime();
             case ANONYMITY:
                 Integer anonymityLevel1 = ProxyAnonymity.getAnonimityLevel(proxyServer1.getAnonymity());
                 Integer anonymityLevel2 = ProxyAnonymity.getAnonimityLevel(proxyServer2.getAnonymity());
                 return anonymityLevel1 < anonymityLevel2;
+            case WORKLOAD:
+                return proxyServer1.getWorkload() > proxyServer2.getWorkload();
         }
         return false;
     }
 
     /**
      * This method divides given array in two and recursively calls this method for both of them if their size is more than 1
-     * @param A array to be divided
-     * @param sizeA array's size
+     *
+     * @param A         array to be divided
+     * @param sizeA     array's size
      * @param criterion criterion, by which the sorting should be done
      */
     private void mergeSort(ProxyServer[] A, int sizeA, ProxyServersSortingCriterion criterion) {
@@ -60,11 +64,12 @@ public class MergeSorter {
 
     /**
      * This method merges two given arrays into sorted one
-     * @param A the first array
-     * @param B the second array
-     * @param C the third array - the one that will be the result of merging (as a result, the sorted one)
-     * @param sizeB size of the first array
-     * @param sizeC size of the second array
+     *
+     * @param A         the first array
+     * @param B         the second array
+     * @param C         the third array - the one that will be the result of merging (as a result, the sorted one)
+     * @param sizeB     size of the first array
+     * @param sizeC     size of the second array
      * @param criterion criterion, by which the sorting should be done
      */
     private void merge(ProxyServer[] A, ProxyServer[] B, ProxyServer[] C,

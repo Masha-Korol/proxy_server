@@ -1,24 +1,30 @@
 package com.dsr.proxy_server.service;
 
-import com.dsr.proxy_server.config.ServersCheckThreadManager;
+import com.dsr.proxy_server.config.ThreadManager;
 import com.dsr.proxy_server.data.dto.ChangeServersCheckTimingRequest;
 import com.dsr.proxy_server.data.dto.ProxyServersResponse.ProxyResultItem;
 import com.dsr.proxy_server.data.dto.ProxyServersResponse.ProxyServerResponseEntity;
+import com.dsr.proxy_server.data.entity.ProxyServer;
 import com.dsr.proxy_server.data.enums.YesNoAny;
 import com.dsr.proxy_server.mapper.ProxyResultItemMapper;
 import com.dsr.proxy_server.repositories.ProxyServerRepository;
 import com.dsr.proxy_server.thread.ServersCheckThread;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
+
+import java.util.Date;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
- * This class contains the logic that's connected with proxy servers checking:
- * adding and deleting them from db;
- * work with threads
+ * This class contains the logic that's connected with proxy servers updating:
+ * adding them to db;
+ * work with threads;
+ * updating their workload.
  */
 @Service
 public class ProxyServersManagerService {
@@ -41,8 +47,8 @@ public class ProxyServersManagerService {
 
     /**
      * This method gets all the proxy servers and analyzes them:
-     * if the server is available and it is not in the database, then add it;
-     * if the server is not available and it is in the database, then delete it
+     * if the server is not in the database, add it
+     * if the availability of the server in the db is incorrect, update it
      */
     @Transactional
     public void checkAllServers() {
@@ -50,30 +56,61 @@ public class ProxyServersManagerService {
         List<ProxyResultItem> allServers = proxyServerResponseEntity.getResponse().getItems();
         for (ProxyResultItem proxyResultItem : allServers) {
 
-            // if the server is not in the database yet and it's available
-            if (!proxyServerRepository.existsByIp(proxyResultItem.getIp()) &&
-                    YesNoAny.Yes.equals(proxyResultItem.getAvailable())) {
-
+            // if the server is not in the database yet
+            if (!proxyServerRepository.existsByIp(proxyResultItem.getIp())) {
                 // if country of the current proxy server doesn't exist in the database, then add it
                 countryService.add(proxyResultItem.getCountry());
                 add(proxyResultItem);
-            }
-            // if the server is in the database and it's not available, then delete it
-            else if (proxyServerRepository.existsByIp(proxyResultItem.getIp()) &&
-                    YesNoAny.No.equals(proxyResultItem.getAvailable())) {
-                delete(proxyResultItem);
+            } else {
+                // if the availability of the server in the db is different from the actual availability,
+                // update the one in the db
+                if (!proxyServerRepository.findByIp(proxyResultItem.getIp()).getAvailable().equals(
+                        proxyResultItem.getAvailable())) {
+                    changeProxyServerAvailability(proxyResultItem);
+                } else {
+                    ProxyServer proxyServer = proxyServerRepository.findByIp(proxyResultItem.getIp());
+                    updateLastTimeCheckDate(proxyServer);
+                    proxyServerRepository.save(proxyServer);
+                }
             }
         }
     }
 
     private void add(ProxyResultItem proxyResultItem) {
-        proxyServerRepository.save(proxyResultItemMapper.toEntity(proxyResultItem));
-        logger.info("server " + proxyResultItem.getIp() + " has been added");
+        ProxyServer proxyServer = proxyResultItemMapper.toEntity(proxyResultItem);
+        updateLastTimeCheckDate(proxyServer);
+        proxyServer.setWorkload(0);
+        proxyServerRepository.save(proxyServer);
+        logger.info("server " + proxyServer.toString() + " has been added");
     }
 
     private void delete(ProxyResultItem proxyResultItem) {
-        proxyServerRepository.delete(proxyResultItemMapper.toEntity(proxyResultItem));
-        logger.info("server " + proxyResultItem.getIp() + " has been deleted");
+        ProxyServer proxyServer = proxyResultItemMapper.toEntity(proxyResultItem);
+        proxyServerRepository.delete(proxyServer);
+        logger.info("server " + proxyServer.toString() + " has been deleted");
+    }
+
+    /**
+     * This method updates the time of the last check for availability (sets current date and time)
+     *
+     * @param proxyServer the proxy sever, whose last time check date needs to be updated
+     */
+    private void updateLastTimeCheckDate(ProxyServer proxyServer) {
+        proxyServer.setLastTimeCheck(new Date());
+    }
+
+    /**
+     * This method changes the availability of the proxy server
+     *
+     * @param proxyResultItem - the entity of type ProxyResultItem, that contains actual info about the proxy server
+     */
+    private void changeProxyServerAvailability(ProxyResultItem proxyResultItem) {
+        ProxyServer proxyServer = proxyServerRepository.findByIp(proxyResultItem.getIp());
+        proxyServer.setAvailable(proxyResultItem.getAvailable());
+        updateLastTimeCheckDate(proxyServer);
+        proxyServerRepository.save(proxyServer);
+        logger.info("server " + proxyResultItem.getIp() + " availability has been changed to " +
+                proxyResultItem.getAvailable() + ". Proxy: " + proxyServer.toString());
     }
 
     /**
@@ -113,9 +150,28 @@ public class ProxyServersManagerService {
         // change the time interval and notify the thread, that time interval has changed
         if (intervalInMillis != null) {
             ServersCheckThread.checkServersTimeInterval = intervalInMillis;
-            synchronized (ServersCheckThreadManager.serversCheckThread) {
-                ServersCheckThreadManager.serversCheckThread.notify();
+            synchronized (ThreadManager.serversCheckThread) {
+                ThreadManager.serversCheckThread.notify();
             }
         }
+    }
+
+    /**
+     * This method nullifies workload of every proxy server in the db.
+     * It is called by a ServersWorkloadControlThread once in a certain time interval
+     */
+    @Transactional
+    public void nullifyWorkload() {
+        Iterable<ProxyServer> allProxyServers = proxyServerRepository.findAll();
+        for (ProxyServer proxyServer : allProxyServers) {
+            proxyServer.setWorkload(0);
+            proxyServerRepository.save(proxyServer);
+        }
+    }
+
+    public List<ProxyServer> getAll() {
+        List<ProxyServer> allProxyServers = (List<ProxyServer>) proxyServerRepository.findAll();
+        return allProxyServers.stream().filter(proxyServer -> YesNoAny.Yes.equals(proxyServer.getAvailable())).
+                collect(Collectors.toList());
     }
 }

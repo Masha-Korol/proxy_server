@@ -3,8 +3,12 @@ package com.dsr.proxy_server.data.entity;
 import com.dsr.proxy_server.data.enums.ProxyAnonymity;
 import com.dsr.proxy_server.data.enums.ProxyProtocol;
 import com.dsr.proxy_server.data.enums.YesNoAny;
+import org.joda.time.DateTime;
+import org.joda.time.LocalDate;
+import org.joda.time.LocalDateTime;
 
 import javax.persistence.*;
+import java.util.Date;
 import java.util.Objects;
 
 /**
@@ -26,6 +30,13 @@ public class ProxyServer {
     private Double uptime;
     @Column(columnDefinition = "VARCHAR")
     private YesNoAny available;
+    @Column(columnDefinition = "DATE")
+    private Date lastTimeCheck;
+    /**
+     * This variable is used to store the number of calls for the current proxy server during the day
+     * (it's nullified once a day by a thread)
+     */
+    private Integer workload;
 
     @ManyToOne
     @JoinColumn(name = "country_id")
@@ -87,6 +98,30 @@ public class ProxyServer {
         this.country = country;
     }
 
+    public Date getLastTimeCheck() {
+        return lastTimeCheck;
+    }
+
+    public void setLastTimeCheck(Date lastTimeCheck) {
+        this.lastTimeCheck = lastTimeCheck;
+    }
+
+    public Integer getWorkload() {
+        return workload;
+    }
+
+    public void setWorkload(Integer workload) {
+        this.workload = workload;
+    }
+
+    public Integer getProxyServerId() {
+        return proxyServerId;
+    }
+
+    public void setProxyServerId(Integer proxyServerId) {
+        this.proxyServerId = proxyServerId;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -116,6 +151,8 @@ public class ProxyServer {
                 ", anonymity=" + anonymity +
                 ", uptime=" + uptime +
                 ", available=" + available +
+                ", lastTimeCheck=" + lastTimeCheck +
+                ", workload=" + workload +
                 ", country=" + country +
                 '}';
     }

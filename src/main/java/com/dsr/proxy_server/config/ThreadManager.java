@@ -2,6 +2,7 @@ package com.dsr.proxy_server.config;
 
 import com.dsr.proxy_server.service.ProxyServersManagerService;
 import com.dsr.proxy_server.thread.ServersCheckThread;
+import com.dsr.proxy_server.thread.ServersWorkloadControlThread;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
@@ -11,11 +12,12 @@ import org.springframework.core.task.SimpleAsyncTaskExecutor;
 import org.springframework.core.task.TaskExecutor;
 
 @Configuration
-public class ServersCheckThreadManager {
+public class ThreadManager {
 
     @Autowired
     private ProxyServersManagerService proxyServersManagerService;
     public static ServersCheckThread serversCheckThread;
+    public static ServersWorkloadControlThread serversWorkloadControlThread;
 
     @Bean
     @Primary
@@ -29,6 +31,8 @@ public class ServersCheckThreadManager {
             public void run(String... args) throws Exception {
                 serversCheckThread = new ServersCheckThread(proxyServersManagerService);
                 executor.execute(serversCheckThread);
+                serversWorkloadControlThread = new ServersWorkloadControlThread(proxyServersManagerService);
+                executor.execute(serversWorkloadControlThread);
             }
         };
     }

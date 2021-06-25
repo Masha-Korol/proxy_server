@@ -29,7 +29,7 @@ public class CountryService {
         if (!countryRepository.existsByNameEn(countryResult.getNameEn())) {
             Country country = new Country(countryResult.getNameEn());
             countryRepository.save(country);
-            logger.info("country " + country.getNameEn() + " has been added");
+            logger.info("country " + country.toString() + " has been added");
         }
     }
 }

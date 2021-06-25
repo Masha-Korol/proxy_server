@@ -12,4 +12,5 @@ import java.util.*;
 public interface ProxyServerRepository extends PagingAndSortingRepository<ProxyServer, Integer> {
     boolean existsByIp(String ip);
     List<ProxyServer> findAllByCountry(Country country);
+    ProxyServer findByIp(String ip);
 }

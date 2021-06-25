@@ -2,6 +2,7 @@ package com.dsr.proxy_server.data.dto.proxy;
 
 import com.dsr.proxy_server.data.enums.ContentType;
 import com.dsr.proxy_server.data.enums.Method;
+import com.dsr.proxy_server.data.enums.ProxyProtocol;
 import java.util.Objects;
 
 /**
@@ -14,6 +15,15 @@ public class ProxyServerRequest {
     private String url;
     private ContentType contentType;
     private Object payload;
+    private ProxyProtocol proxyProtocol;
+
+    public ProxyProtocol getProxyProtocol() {
+        return proxyProtocol;
+    }
+
+    public void setProxyProtocol(ProxyProtocol proxyProtocol) {
+        this.proxyProtocol = proxyProtocol;
+    }
 
     public String getCountry() {
         return country;
@@ -64,22 +74,24 @@ public class ProxyServerRequest {
                 method == that.method &&
                 Objects.equals(url, that.url) &&
                 contentType == that.contentType &&
-                Objects.equals(payload, that.payload);
+                Objects.equals(payload, that.payload) &&
+                proxyProtocol == that.proxyProtocol;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(country, method, url, contentType, payload);
+        return Objects.hash(country, method, url, contentType, payload, proxyProtocol);
     }
 
     @Override
     public String toString() {
         return "ProxyServerRequest{" +
-                "country=" + country +
+                "country='" + country + '\'' +
                 ", method=" + method +
                 ", url='" + url + '\'' +
                 ", contentType=" + contentType +
                 ", payload=" + payload +
+                ", proxyProtocol=" + proxyProtocol +
                 '}';
     }
 }

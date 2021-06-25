@@ -8,10 +8,9 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 /**
- * This thread checks all the proxy servers, adds available ones, if they're not in the db,
- * and deletes  unavailable ones
+ * This thread checks all the proxy servers, adds servers, if they're not in the db
+ * and marks them available or unavailable if their status has changed
  */
-@Component("thread")
 @Scope("prototype")
 public class ServersCheckThread implements Runnable {
 
@@ -46,7 +45,7 @@ public class ServersCheckThread implements Runnable {
             logger.info("waiting for " + checkServersTimeInterval + " millis");
             wait(checkServersTimeInterval);
         } catch (InterruptedException e) {
-            e.printStackTrace();
+            logger.error(e.getMessage());
         }
     }
 }

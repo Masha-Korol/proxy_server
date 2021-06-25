@@ -8,7 +8,6 @@ public class ProxyServerApplication {
 
 	public static void main(String[] args) {
 		SpringApplication.run(ProxyServerApplication.class, args);
-		//proxyServerService.startServersCheckThread();
 	}
 
 }
