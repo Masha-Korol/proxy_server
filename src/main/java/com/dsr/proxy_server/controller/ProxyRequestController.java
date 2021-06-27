@@ -4,7 +4,8 @@ import com.dsr.proxy_server.data.dto.proxy.ProxyServerRequest;
 import com.dsr.proxy_server.data.dto.proxy.ProxyServerResponse;
 import com.dsr.proxy_server.service.ProxyRequestService;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
+
+import java.io.IOException;
 
 @RestController
 @CrossOrigin
@@ -18,7 +19,7 @@ public class ProxyRequestController {
     }
 
     @PostMapping("/")
-    public ProxyServerResponse sendRequest(@RequestBody ProxyServerRequest request){
+    public ProxyServerResponse sendRequest(@RequestBody ProxyServerRequest request) throws IOException, InterruptedException {
         return proxyRequestService.directRequestToProxyServer(request);
     }
 }

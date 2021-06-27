@@ -8,10 +8,32 @@ import com.dsr.proxy_server.data.enums.*;
 import com.dsr.proxy_server.repositories.CountryRepository;
 import com.dsr.proxy_server.repositories.ProxyServerRepository;
 import com.dsr.proxy_server.sorting.MergeSorter;
+import org.apache.http.HttpEntity;
+import org.apache.http.HttpHost;
+import org.apache.http.auth.AuthScope;
+import org.apache.http.auth.UsernamePasswordCredentials;
+import org.apache.http.client.CredentialsProvider;
+import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.entity.StringEntity;
+import org.apache.http.impl.client.BasicCredentialsProvider;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClients;
+import org.apache.http.impl.conn.BasicHttpClientConnectionManager;
+import org.apache.http.util.EntityUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.apache.maven.wagon.ConnectionException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.io.*;
+import java.net.*;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
+import java.time.Duration;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -43,7 +65,7 @@ public class ProxyRequestService {
      * @return response entity of type ProxyServerResponse
      */
     @Transactional
-    public ProxyServerResponse directRequestToProxyServer(ProxyServerRequest request) {
+    public ProxyServerResponse directRequestToProxyServer(ProxyServerRequest request) throws IOException, InterruptedException {
         // request validation
         ProxyServerResponse validationResult = validateProxyRequest(request);
         if (validationResult != null) {
@@ -60,12 +82,81 @@ public class ProxyRequestService {
                     "Bad Request. There's no available proxy servers in " + request.getCountry());
         }
         ProxyServer proxyServer = getTheBestProxyServerOfAll(proxyServers, request.getProxyProtocol());
-        // TODO redirect request to proxy
-        updateProxyServerWorkload(proxyServer);
-        logger.info("OK. The request has been successfully sent to proxy. Proxy: " +
-                proxyServer.toString() + ". Request: " + request.toString());
-        return new ProxyServerResponse(proxyServer.getIp(), 200,
-                "OK. Your request has been successfully sent to proxy with ip " + proxyServers.get(0).getIp());
+        ProxyServerResponse proxyServerResponse = redirectRequestToProxyServer(request, proxyServer);
+        logger.info("The response has been sent : " + proxyServerResponse.toString());
+        if (proxyServerResponse.getIp() != null) {
+            updateProxyServerWorkload(proxyServer);
+        }
+        return proxyServerResponse;
+    }
+
+    /**
+     * This method sends request through the chosen proxy server
+     * @param request request to be sent
+     * @param proxyServer proxy through which request needs to be sent
+     * @return response of type ProxyServerResponse
+     */
+    private ProxyServerResponse redirectRequestToProxyServer(ProxyServerRequest request, ProxyServer proxyServer) {
+        HttpClient client = HttpClient.newBuilder()
+                .version(HttpClient.Version.HTTP_1_1)
+                .followRedirects(HttpClient.Redirect.NORMAL)
+                .connectTimeout(Duration.ofSeconds(20))
+                .proxy(ProxySelector.of(new InetSocketAddress(proxyServer.getIp(), proxyServer.getPort())))
+                .build();
+        try {
+            HttpRequest newHttpRequest = null;
+            Method method = request.getMethod();
+            switch (method) {
+                case PUT:
+                    newHttpRequest = HttpRequest
+                            .newBuilder(new URI(request.getUrl()))
+                            .header("Content-Type", getContentTypeInCorrectFormat(request.getContentType()))
+                            .PUT(HttpRequest.BodyPublishers.ofString(request.getPayload().toString()))
+                            .build();
+                    break;
+                case POST:
+                    newHttpRequest = HttpRequest
+                            .newBuilder(new URI(request.getUrl()))
+                            .header("Content-Type", getContentTypeInCorrectFormat(request.getContentType()))
+                            .POST(HttpRequest.BodyPublishers.ofString(request.getPayload().toString()))
+                            .build();
+                    break;
+                case GET:
+                    newHttpRequest = HttpRequest
+                            .newBuilder(new URI(request.getUrl()))
+                            .GET()
+                            .build();
+                    break;
+                case DELETE:
+                    newHttpRequest = HttpRequest
+                            .newBuilder(new URI(request.getUrl()))
+                            .DELETE()
+                            .build();
+                    break;
+            }
+            HttpResponse<String> response = client.send(newHttpRequest, HttpResponse.BodyHandlers.ofString());
+            return new ProxyServerResponse(proxyServer.getIp(), response.statusCode(), response.body());
+        } catch (URISyntaxException | InterruptedException | IOException e) {
+            logger.error(e.getMessage());
+            return new ProxyServerResponse(null, null,
+                    "An error occurred: " + e.getMessage());
+        }
+    }
+
+    /**
+     * This method converts entity of type ContentType to entity of type string for newHttpRequest
+     *
+     * @param contentType entity of type ContentType that needs to be converted
+     * @return converted entity
+     */
+    private String getContentTypeInCorrectFormat(ContentType contentType) {
+        switch (contentType) {
+            case JSON:
+                return "application/json";
+            case TEXT:
+                return "text/plain";
+        }
+        return "";
     }
 
     /**
@@ -75,6 +166,7 @@ public class ProxyRequestService {
      */
     private void updateProxyServerWorkload(ProxyServer proxyServer) {
         proxyServer.setWorkload(proxyServer.getWorkload() + 1);
+        logger.info("The workload of the server has been changed: " + proxyServer.toString());
     }
 
     /**
