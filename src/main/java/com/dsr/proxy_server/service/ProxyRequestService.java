@@ -65,7 +65,7 @@ public class ProxyRequestService {
      * @return response entity of type ProxyServerResponse
      */
     @Transactional
-    public ProxyServerResponse directRequestToProxyServer(ProxyServerRequest request) throws IOException, InterruptedException {
+    public ProxyServerResponse directRequestToProxyServer(ProxyServerRequest request) {
         // request validation
         ProxyServerResponse validationResult = validateProxyRequest(request);
         if (validationResult != null) {
@@ -102,6 +102,7 @@ public class ProxyRequestService {
                 .followRedirects(HttpClient.Redirect.NORMAL)
                 .connectTimeout(Duration.ofSeconds(20))
                 .proxy(ProxySelector.of(new InetSocketAddress(proxyServer.getIp(), proxyServer.getPort())))
+                // .proxy(ProxySelector.of(new InetSocketAddress("91.217.42.3", 8080)))
                 .build();
         try {
             HttpRequest newHttpRequest = null;

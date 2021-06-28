@@ -4,6 +4,8 @@ import com.dsr.proxy_server.config.ThreadManager;
 import com.dsr.proxy_server.data.dto.ChangeServersCheckTimingRequest;
 import com.dsr.proxy_server.data.dto.ProxyServersResponse.ProxyResultItem;
 import com.dsr.proxy_server.data.dto.ProxyServersResponse.ProxyServerResponseEntity;
+import com.dsr.proxy_server.data.dto.pagination.PageDto;
+import com.dsr.proxy_server.data.dto.pagination.PageRequestDto;
 import com.dsr.proxy_server.data.entity.ProxyServer;
 import com.dsr.proxy_server.data.enums.YesNoAny;
 import com.dsr.proxy_server.mapper.ProxyResultItemMapper;
@@ -11,7 +13,9 @@ import com.dsr.proxy_server.repositories.ProxyServerRepository;
 import com.dsr.proxy_server.thread.ServersCheckThread;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
@@ -169,9 +173,14 @@ public class ProxyServersManagerService {
         }
     }
 
-    public List<ProxyServer> getAll() {
-        List<ProxyServer> allProxyServers = (List<ProxyServer>) proxyServerRepository.findAll();
-        return allProxyServers.stream().filter(proxyServer -> YesNoAny.Yes.equals(proxyServer.getAvailable())).
-                collect(Collectors.toList());
+    public PageDto<ProxyServer> getAll(PageRequestDto pageRequest) {
+        Pageable pageable = PageRequest.of(pageRequest.getPage() - 1, pageRequest.getItemsPerPage(),
+                pageRequest.getSort());
+        Page<ProxyServer> page = proxyServerRepository.findAll(pageable);
+        // filter only available ones
+        page.filter(proxyServer -> YesNoAny.Yes.equals(proxyServer.getAvailable()));
+        return new PageDto<ProxyServer>(page);
+        /*return allProxyServers.stream().filter(proxyServer -> YesNoAny.Yes.equals(proxyServer.getAvailable())).
+                collect(Collectors.toList());*/
     }
 }
