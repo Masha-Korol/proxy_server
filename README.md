@@ -1,6 +1,6 @@
 Proxy server
 
-This application provides REST-API redirecting users’ requests to proxy servers. User can choose a country - preferable proxy location. 
+This application provides REST-API redirecting usersвЂ™ requests to proxy servers. User can choose a country - preferable proxy location. 
 
 Technology stack:
 
@@ -21,7 +21,7 @@ How to use the application (views in the Postman):
 1. To get the list of all the available proxy servers:
 http://localhost:8080/api/v1/servers/ 
 
-Пример тела запроса:
+РџСЂРёРјРµСЂ С‚РµР»Р° Р·Р°РїСЂРѕСЃР°:
 {
     "sort": "port",
     "page": 1,
@@ -32,7 +32,7 @@ http://localhost:8080/api/v1/servers/
 2. To send a request:
 http://localhost:8080/api/v1/requests/ 
 
-Пример тела запроса:
+РџСЂРёРјРµСЂ С‚РµР»Р° Р·Р°РїСЂРѕСЃР°:
 {
     "country": "Russia",
     "method": "GET",
@@ -43,10 +43,10 @@ http://localhost:8080/api/v1/requests/
 }
 
 
-3. To change time interval for proxy servers’ list updating:
+3. To change time interval for proxy serversвЂ™ list updating:
 http://localhost:8080/api/v1/servers/timing
 
-Пример тела запроса:
+РџСЂРёРјРµСЂ С‚РµР»Р° Р·Р°РїСЂРѕСЃР°:
 {
     "timeUnit": "SECONDS",
     "interval": 1
