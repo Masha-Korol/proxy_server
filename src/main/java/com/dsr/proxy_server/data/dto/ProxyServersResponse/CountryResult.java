@@ -17,6 +17,13 @@ public class CountryResult {
         this.nameEn = nameEn;
     }
 
+    public CountryResult() {
+    }
+
+    public CountryResult(String nameEn) {
+        this.nameEn = nameEn;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

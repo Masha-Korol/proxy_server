@@ -2,13 +2,17 @@ package com.dsr.proxy_server.service;
 
 import com.dsr.proxy_server.config.ThreadManager;
 import com.dsr.proxy_server.data.dto.ChangeServersCheckTimingRequest;
+import com.dsr.proxy_server.data.dto.proxy_creation.ProxyServerCreationDto;
+import com.dsr.proxy_server.data.dto.ProxyServersResponse.CountryResult;
 import com.dsr.proxy_server.data.dto.ProxyServersResponse.ProxyResultItem;
 import com.dsr.proxy_server.data.dto.ProxyServersResponse.ProxyServerResponseEntity;
 import com.dsr.proxy_server.data.dto.pagination.PageDto;
 import com.dsr.proxy_server.data.dto.pagination.PageRequestDto;
+import com.dsr.proxy_server.data.dto.proxy_creation.ProxyServerCreationResponseDto;
 import com.dsr.proxy_server.data.entity.ProxyServer;
 import com.dsr.proxy_server.data.enums.YesNoAny;
 import com.dsr.proxy_server.mapper.ProxyResultItemMapper;
+import com.dsr.proxy_server.mapper.ProxyServerCreationDtoMapper;
 import com.dsr.proxy_server.repositories.ProxyServerRepository;
 import com.dsr.proxy_server.thread.ServersCheckThread;
 import org.apache.logging.log4j.LogManager;
@@ -20,9 +24,14 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
 
+import java.io.IOException;
+import java.net.*;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
+import java.time.Duration;
 import java.util.Date;
 import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * This class contains the logic that's connected with proxy servers updating:
@@ -38,15 +47,17 @@ public class ProxyServersManagerService {
     private final CountryService countryService;
     private final ProxyServerRepository proxyServerRepository;
     private final ProxyResultItemMapper proxyResultItemMapper;
+    private final ProxyServerCreationDtoMapper proxyServerCreationDtoMapper;
     private static final Logger logger = LogManager.getLogger(ProxyServersManagerService.class);
 
     public ProxyServersManagerService(RestTemplate restTemplate,
                                       CountryService countryService, ProxyServerRepository proxyServerRepository,
-                                      ProxyResultItemMapper proxyResultItemMapper) {
+                                      ProxyResultItemMapper proxyResultItemMapper, ProxyServerCreationDtoMapper proxyServerCreationDtoMapper) {
         this.restTemplate = restTemplate;
         this.countryService = countryService;
         this.proxyServerRepository = proxyServerRepository;
         this.proxyResultItemMapper = proxyResultItemMapper;
+        this.proxyServerCreationDtoMapper = proxyServerCreationDtoMapper;
     }
 
     /**
@@ -64,7 +75,9 @@ public class ProxyServersManagerService {
             if (!proxyServerRepository.existsByIp(proxyResultItem.getIp())) {
                 // if country of the current proxy server doesn't exist in the database, then add it
                 countryService.add(proxyResultItem.getCountry());
-                add(proxyResultItem);
+                ProxyServer proxyServer = proxyResultItemMapper.toEntity(proxyResultItem);
+                // TODO раскомментить
+                // add(proxyServer);
             } else {
                 // if the availability of the server in the db is different from the actual availability,
                 // update the one in the db
@@ -80,14 +93,77 @@ public class ProxyServersManagerService {
         }
     }
 
-    private void add(ProxyResultItem proxyResultItem) {
-        ProxyServer proxyServer = proxyResultItemMapper.toEntity(proxyResultItem);
-        updateLastTimeCheckDate(proxyServer);
-        proxyServer.setWorkload(0);
-        proxyServerRepository.save(proxyServer);
-        logger.info("server " + proxyServer.toString() + " has been added");
+    /**
+     * This method adds proxy to database (if it's available)
+     *
+     * @param proxyServer entity of type ProxyServer
+     */
+    private boolean add(ProxyServer proxyServer) {
+        if (ifProxyAvailable(proxyServer)) {
+            updateLastTimeCheckDate(proxyServer);
+            proxyServer.setWorkload(0);
+            proxyServerRepository.save(proxyServer);
+            logger.info("server " + proxyServer.toString() + " has been added");
+            return true;
+        } else {
+            return false;
+        }
     }
 
+    /**
+     * This method adds proxy server to database (getting data about proxy server from post request)
+     *
+     * @param proxyServerCreationDto entity of type ProxyServerCreationDto
+     */
+    @Transactional
+    public ProxyServerCreationResponseDto addProxyServerByRequest(ProxyServerCreationDto proxyServerCreationDto) {
+        CountryResult countryResult = new CountryResult(proxyServerCreationDto.getCountryName());
+        countryService.add(countryResult);
+        boolean added = add(proxyServerCreationDtoMapper.toEntity(proxyServerCreationDto));
+        if (added) {
+            return new ProxyServerCreationResponseDto("Proxy server has been successfully added: " +
+                    proxyServerCreationDto.toString());
+        } else {
+            return new ProxyServerCreationResponseDto("Proxy server is unavailable");
+        }
+    }
+
+    /**
+     * This method checks if the passed proxy server is available
+     *
+     * @param proxyServer entity of type ProxyServer - server to be checked
+     * @return true if proxy is available, false otherwise
+     */
+    private boolean ifProxyAvailable(ProxyServer proxyServer) {
+        HttpClient client = HttpClient.newBuilder()
+                .version(HttpClient.Version.HTTP_1_1)
+                .followRedirects(HttpClient.Redirect.NORMAL)
+                .connectTimeout(Duration.ofSeconds(20))
+                .proxy(ProxySelector.of(new InetSocketAddress(proxyServer.getIp(), proxyServer.getPort())))
+                .build();
+        HttpRequest newHttpRequest = null;
+        try {
+            newHttpRequest = HttpRequest
+                    .newBuilder(new URI(PROXY_SERVERS_DATA_SOURCE_URL))
+                    .GET()
+                    .build();
+            HttpResponse<String> response = client.send(newHttpRequest, HttpResponse.BodyHandlers.ofString());
+            if (response.statusCode() != 200) {
+                logger.warn("server with ip " + proxyServer.getIp() + " is unavailable");
+                return false;
+            }
+            return true;
+        } catch (URISyntaxException | IOException | InterruptedException e) {
+            logger.warn("server with ip " + proxyServer.getIp() + " is unavailable");
+            return false;
+        }
+    }
+
+    /**
+     * This method deleted proxy from database
+     *
+     * @param proxyResultItem entity of type ProxyResultItem
+     */
     private void delete(ProxyResultItem proxyResultItem) {
         ProxyServer proxyServer = proxyResultItemMapper.toEntity(proxyResultItem);
         proxyServerRepository.delete(proxyServer);
@@ -173,6 +249,12 @@ public class ProxyServersManagerService {
         }
     }
 
+    /**
+     * This method returns all the available proxy servers in the form of page
+     *
+     * @param pageRequest entity of type PageRequestDto
+     * @return list of entities of type PageDto
+     */
     public PageDto<ProxyServer> getAll(PageRequestDto pageRequest) {
         Pageable pageable = PageRequest.of(pageRequest.getPage() - 1, pageRequest.getItemsPerPage(),
                 pageRequest.getSort());
@@ -180,7 +262,5 @@ public class ProxyServersManagerService {
         // filter only available ones
         page.filter(proxyServer -> YesNoAny.Yes.equals(proxyServer.getAvailable()));
         return new PageDto<ProxyServer>(page);
-        /*return allProxyServers.stream().filter(proxyServer -> YesNoAny.Yes.equals(proxyServer.getAvailable())).
-                collect(Collectors.toList());*/
     }
 }

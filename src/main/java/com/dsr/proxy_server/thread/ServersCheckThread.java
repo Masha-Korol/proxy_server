@@ -47,7 +47,7 @@ public class ServersCheckThread implements Runnable, DisposableBean {
         // then sleeps for a certain amount of time (checkServersTimeInterval variable)
         proxyServersManagerService.checkAllServers();
         try {
-            logger.info("thread ServersCheckThread is now waiting for " + checkServersTimeInterval + " millis");
+            logger.info("thread ServersCheckThread finished checking is now waiting for " + checkServersTimeInterval + " millis");
             wait(checkServersTimeInterval);
         } catch (InterruptedException e) {
             logger.error(e.getMessage());

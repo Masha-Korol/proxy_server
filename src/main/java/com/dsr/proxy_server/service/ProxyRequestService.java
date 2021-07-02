@@ -92,7 +92,8 @@ public class ProxyRequestService {
 
     /**
      * This method sends request through the chosen proxy server
-     * @param request request to be sent
+     *
+     * @param request     request to be sent
      * @param proxyServer proxy through which request needs to be sent
      * @return response of type ProxyServerResponse
      */
@@ -102,7 +103,7 @@ public class ProxyRequestService {
                 .followRedirects(HttpClient.Redirect.NORMAL)
                 .connectTimeout(Duration.ofSeconds(20))
                 .proxy(ProxySelector.of(new InetSocketAddress(proxyServer.getIp(), proxyServer.getPort())))
-                // .proxy(ProxySelector.of(new InetSocketAddress("91.217.42.3", 8080)))
+                // .proxy(ProxySelector.of(new InetSocketAddress("185.23.80.17", 8080)))
                 .build();
         try {
             HttpRequest newHttpRequest = null;
