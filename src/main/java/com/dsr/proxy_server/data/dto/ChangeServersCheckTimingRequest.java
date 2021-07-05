@@ -2,6 +2,8 @@ package com.dsr.proxy_server.data.dto;
 
 import com.dsr.proxy_server.data.enums.TimeUnit;
 
+import javax.validation.constraints.Min;
+import javax.validation.constraints.NotNull;
 import java.util.Objects;
 
 /**
@@ -9,7 +11,9 @@ import java.util.Objects;
  */
 public class ChangeServersCheckTimingRequest {
 
+    @NotNull
     private TimeUnit timeUnit;
+    @Min(1)
     private Integer interval;
 
     public TimeUnit getTimeUnit() {

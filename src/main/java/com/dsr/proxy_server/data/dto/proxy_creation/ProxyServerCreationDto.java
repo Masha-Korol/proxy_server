@@ -1,15 +1,43 @@
 package com.dsr.proxy_server.data.dto.proxy_creation;
 
+import com.dsr.proxy_server.data.enums.ProxyAnonymity;
 import com.dsr.proxy_server.data.enums.ProxyProtocol;
 
+import javax.validation.constraints.DecimalMin;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import java.util.Objects;
 
 public class ProxyServerCreationDto {
 
+    @NotBlank
     private String ip;
+    @NotNull
     private Integer port;
-    private ProxyProtocol proxyProtocol;
+    @NotNull
+    private ProxyProtocol type;
+    @NotBlank
     private String countryName;
+    @NotNull
+    private ProxyAnonymity anonymity;
+    @NotNull
+    private Double uptime;
+
+    public ProxyAnonymity getAnonymity() {
+        return anonymity;
+    }
+
+    public void setAnonymity(ProxyAnonymity anonymity) {
+        this.anonymity = anonymity;
+    }
+
+    public Double getUptime() {
+        return uptime;
+    }
+
+    public void setUptime(Double uptime) {
+        this.uptime = uptime;
+    }
 
     public String getIp() {
         return ip;
@@ -27,12 +55,12 @@ public class ProxyServerCreationDto {
         this.port = port;
     }
 
-    public ProxyProtocol getProxyProtocol() {
-        return proxyProtocol;
+    public ProxyProtocol getType() {
+        return type;
     }
 
-    public void setProxyProtocol(ProxyProtocol proxyProtocol) {
-        this.proxyProtocol = proxyProtocol;
+    public void setType(ProxyProtocol type) {
+        this.type = type;
     }
 
     public String getCountryName() {
@@ -50,13 +78,15 @@ public class ProxyServerCreationDto {
         ProxyServerCreationDto that = (ProxyServerCreationDto) o;
         return Objects.equals(ip, that.ip) &&
                 Objects.equals(port, that.port) &&
-                proxyProtocol == that.proxyProtocol &&
-                Objects.equals(countryName, that.countryName);
+                type == that.type &&
+                Objects.equals(countryName, that.countryName) &&
+                anonymity == that.anonymity &&
+                Objects.equals(uptime, that.uptime);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(ip, port, proxyProtocol, countryName);
+        return Objects.hash(ip, port, type, countryName, anonymity, uptime);
     }
 
     @Override
@@ -64,8 +94,10 @@ public class ProxyServerCreationDto {
         return "ProxyServerCreationDto{" +
                 "ip='" + ip + '\'' +
                 ", port=" + port +
-                ", proxyProtocol=" + proxyProtocol +
+                ", type=" + type +
                 ", countryName='" + countryName + '\'' +
+                ", anonymity=" + anonymity +
+                ", uptime=" + uptime +
                 '}';
     }
 }

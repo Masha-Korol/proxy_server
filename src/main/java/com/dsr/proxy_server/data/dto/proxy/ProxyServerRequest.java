@@ -3,6 +3,9 @@ package com.dsr.proxy_server.data.dto.proxy;
 import com.dsr.proxy_server.data.enums.ContentType;
 import com.dsr.proxy_server.data.enums.Method;
 import com.dsr.proxy_server.data.enums.ProxyProtocol;
+
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import java.util.Objects;
 
 /**
@@ -10,11 +13,16 @@ import java.util.Objects;
  */
 public class ProxyServerRequest {
 
+    @NotBlank
     private String country;
+    @NotNull
     private Method method;
+    @NotBlank
     private String url;
+    @NotNull
     private ContentType contentType;
     private Object payload;
+    @NotNull
     private ProxyProtocol proxyProtocol;
 
     public ProxyProtocol getProxyProtocol() {

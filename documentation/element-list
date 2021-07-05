@@ -1,0 +1,16 @@
+com.dsr.proxy_server
+com.dsr.proxy_server.config
+com.dsr.proxy_server.controller
+com.dsr.proxy_server.data.dto
+com.dsr.proxy_server.data.dto.pagination
+com.dsr.proxy_server.data.dto.proxy
+com.dsr.proxy_server.data.dto.proxy_creation
+com.dsr.proxy_server.data.dto.ProxyServersResponse
+com.dsr.proxy_server.data.entity
+com.dsr.proxy_server.data.enums
+com.dsr.proxy_server.mapper
+com.dsr.proxy_server.repositories
+com.dsr.proxy_server.service
+com.dsr.proxy_server.sorting
+com.dsr.proxy_server.thread
+com.dsr.proxy_server.validator

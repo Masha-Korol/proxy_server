@@ -25,11 +25,14 @@ public class CountryService {
      *
      * @param countryResult entity of type CountryResult
      */
-    public void add(CountryResult countryResult) {
-        if (!countryRepository.existsByNameEn(countryResult.getNameEn())) {
+    public Country add(CountryResult countryResult) {
+        Country byNameEn = countryRepository.findByNameEn(countryResult.getNameEn());
+        if (byNameEn == null) {
             Country country = new Country(countryResult.getNameEn());
-            countryRepository.save(country);
+            Country savedCountry = countryRepository.save(country);
             logger.info("country " + country.toString() + " has been added");
+            return savedCountry;
         }
+        return byNameEn;
     }
 }

@@ -52,4 +52,17 @@ http://localhost:8080/api/v1/servers/timing
     "interval": 1
 }
 
+4. To add new proxy server:
+http://localhost:8080/api/v1/servers/
+
+Пример тела запроса:
+{
+    "ip": "186.67.226.14",
+    "port": 8080,
+    "type": 2,
+    "countryName": "Chile",
+    "anonymity": "High",
+    "uptime": 0.5 
+}
+
 

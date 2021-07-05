@@ -74,6 +74,9 @@ public class ProxyRequestService {
 
         Country country = countryRepository.findByNameEn(request.getCountry());
         List<ProxyServer> proxyServers = proxyServerRepository.findAllByCountry(country);
+        // filter only available ones
+        proxyServers = proxyServers.stream().filter(proxyServer -> YesNoAny.Yes.equals(proxyServer.getAvailable())).
+                collect(Collectors.toList());
         // request's country validation
         if (proxyServers.size() == 0) {
             logger.warn("Bad Request. There's no available proxy servers in the given country. Request: " +
@@ -103,7 +106,6 @@ public class ProxyRequestService {
                 .followRedirects(HttpClient.Redirect.NORMAL)
                 .connectTimeout(Duration.ofSeconds(20))
                 .proxy(ProxySelector.of(new InetSocketAddress(proxyServer.getIp(), proxyServer.getPort())))
-                // .proxy(ProxySelector.of(new InetSocketAddress("185.23.80.17", 8080)))
                 .build();
         try {
             HttpRequest newHttpRequest = null;

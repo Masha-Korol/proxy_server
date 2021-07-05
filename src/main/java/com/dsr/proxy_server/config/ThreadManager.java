@@ -1,6 +1,8 @@
 package com.dsr.proxy_server.config;
 
+import com.dsr.proxy_server.service.ProxyMaintenanceService;
 import com.dsr.proxy_server.service.ProxyServersManagerService;
+import com.dsr.proxy_server.thread.ServersAvailabilityUpdateThread;
 import com.dsr.proxy_server.thread.ServersCheckThread;
 import com.dsr.proxy_server.thread.ServersWorkloadControlThread;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,8 +18,11 @@ public class ThreadManager {
 
     @Autowired
     private ProxyServersManagerService proxyServersManagerService;
+    @Autowired
+    private ProxyMaintenanceService proxyMaintenanceService;
     public static ServersCheckThread serversCheckThread;
     public static ServersWorkloadControlThread serversWorkloadControlThread;
+    public static ServersAvailabilityUpdateThread serversAvailabilityUpdateThread;
 
     @Bean
     @Primary
@@ -31,8 +36,10 @@ public class ThreadManager {
             public void run(String... args) throws Exception {
                 serversCheckThread = new ServersCheckThread(proxyServersManagerService);
                 executor.execute(serversCheckThread);
-                serversWorkloadControlThread = new ServersWorkloadControlThread(proxyServersManagerService);
+                serversWorkloadControlThread = new ServersWorkloadControlThread(proxyMaintenanceService);
                 executor.execute(serversWorkloadControlThread);
+                serversAvailabilityUpdateThread = new ServersAvailabilityUpdateThread(proxyMaintenanceService);
+                executor.execute(serversAvailabilityUpdateThread);
             }
         };
     }

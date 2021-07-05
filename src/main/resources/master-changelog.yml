@@ -1,0 +1,6 @@
+databaseChangeLog:
+  - preConditions:
+      - dbms:
+          type: postgresql
+  - includeAll:
+      path: classpath:/db/migration

@@ -5,6 +5,7 @@ import com.dsr.proxy_server.data.dto.proxy.ProxyServerResponse;
 import com.dsr.proxy_server.service.ProxyRequestService;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.io.IOException;
 
 @RestController
@@ -19,7 +20,7 @@ public class ProxyRequestController {
     }
 
     @PostMapping("/")
-    public ProxyServerResponse sendRequest(@RequestBody ProxyServerRequest request) throws IOException, InterruptedException {
+    public ProxyServerResponse sendRequest(@Valid @RequestBody ProxyServerRequest request) throws IOException, InterruptedException {
         return proxyRequestService.directRequestToProxyServer(request);
     }
 }

@@ -2,11 +2,8 @@ package com.dsr.proxy_server.data.entity;
 
 import com.dsr.proxy_server.data.enums.ProxyAnonymity;
 import com.dsr.proxy_server.data.enums.ProxyProtocol;
+import com.dsr.proxy_server.data.enums.ProxySourceType;
 import com.dsr.proxy_server.data.enums.YesNoAny;
-import org.joda.time.DateTime;
-import org.joda.time.LocalDate;
-import org.joda.time.LocalDateTime;
-
 import javax.persistence.*;
 import java.util.Date;
 import java.util.Objects;
@@ -32,6 +29,8 @@ public class ProxyServer {
     private YesNoAny available;
     @Column(columnDefinition = "DATE")
     private Date lastTimeCheck;
+    @Column(columnDefinition = "VARCHAR")
+    private ProxySourceType source;
     /**
      * This variable is used to store the number of calls for the current proxy server during the day
      * (it's nullified once a day by a thread)
@@ -41,6 +40,14 @@ public class ProxyServer {
     @ManyToOne
     @JoinColumn(name = "country_id")
     private Country country;
+
+    public ProxySourceType getSource() {
+        return source;
+    }
+
+    public void setSource(ProxySourceType source) {
+        this.source = source;
+    }
 
     public String getIp() {
         return ip;
@@ -129,16 +136,19 @@ public class ProxyServer {
         ProxyServer that = (ProxyServer) o;
         return Objects.equals(ip, that.ip) &&
                 Objects.equals(port, that.port) &&
-                Objects.equals(type, that.type) &&
+                type == that.type &&
                 anonymity == that.anonymity &&
                 Objects.equals(uptime, that.uptime) &&
                 available == that.available &&
+                Objects.equals(lastTimeCheck, that.lastTimeCheck) &&
+                source == that.source &&
+                Objects.equals(workload, that.workload) &&
                 Objects.equals(country, that.country);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(ip, port, type, anonymity, uptime, available, country);
+        return Objects.hash(ip, port, type, anonymity, uptime, available, lastTimeCheck, source, workload, country);
     }
 
     @Override
@@ -152,6 +162,7 @@ public class ProxyServer {
                 ", uptime=" + uptime +
                 ", available=" + available +
                 ", lastTimeCheck=" + lastTimeCheck +
+                ", source=" + source +
                 ", workload=" + workload +
                 ", country=" + country +
                 '}';

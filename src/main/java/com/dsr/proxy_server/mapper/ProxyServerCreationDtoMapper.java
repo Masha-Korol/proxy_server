@@ -12,12 +12,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 @Mapper(componentModel = "spring", imports = ProxyProtocol.class)
 public abstract class ProxyServerCreationDtoMapper extends BaseMapper<ProxyServer, ProxyServerCreationDto> {
 
-    @Autowired
+    /*@Autowired
     protected CountryRepository countryRepository;
 
     @Mappings({
             @Mapping(target = "country",
                     expression = "java(countryRepository.findByNameEn(dto.getCountryName()))")
     })
-    public abstract ProxyServer toEntity(ProxyServerCreationDto dto);
+    public abstract ProxyServer toEntity(ProxyServerCreationDto dto);*/
 }

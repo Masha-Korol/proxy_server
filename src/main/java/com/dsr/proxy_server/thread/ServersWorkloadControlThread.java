@@ -1,6 +1,6 @@
 package com.dsr.proxy_server.thread;
 
-import com.dsr.proxy_server.service.ProxyServersManagerService;
+import com.dsr.proxy_server.service.ProxyMaintenanceService;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.DisposableBean;
@@ -18,11 +18,11 @@ public class ServersWorkloadControlThread implements Runnable, DisposableBean {
      */
     public static Integer nullifyWorkloadTimeInterval = 3600000 * 24;
     private boolean isRunning = true;
-    private final ProxyServersManagerService proxyServersManagerService;
+    private final ProxyMaintenanceService proxyMaintenanceService;
     private static final Logger logger = LogManager.getLogger(ServersWorkloadControlThread.class);
 
-    public ServersWorkloadControlThread(ProxyServersManagerService proxyServersManagerService) {
-        this.proxyServersManagerService = proxyServersManagerService;
+    public ServersWorkloadControlThread(ProxyMaintenanceService proxyMaintenanceService) {
+        this.proxyMaintenanceService = proxyMaintenanceService;
     }
 
     @Override
@@ -34,7 +34,7 @@ public class ServersWorkloadControlThread implements Runnable, DisposableBean {
 
     private synchronized void nullifyWorkload() {
         logger.info("started nullifying proxy's workload");
-        proxyServersManagerService.nullifyWorkload();
+        proxyMaintenanceService.nullifyWorkload();
         try {
             wait(nullifyWorkloadTimeInterval);
         } catch (InterruptedException e) {

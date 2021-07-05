@@ -11,8 +11,8 @@ import org.springframework.stereotype.Component;
 import javax.annotation.PreDestroy;
 
 /**
- * This thread checks all the proxy servers, adds servers, if they're not in the db
- * and marks them available or unavailable if their status has changed
+ * This thread checks all the proxy servers from external resource and adds them to database
+ * if they're available
  */
 @Scope("prototype")
 public class ServersCheckThread implements Runnable, DisposableBean {
@@ -39,7 +39,7 @@ public class ServersCheckThread implements Runnable, DisposableBean {
 
 
     /**
-     * This method calls method, that checks all the servers (adds and deletes them if needed), then sleeps for a certain amount of time
+     * This method calls method, that checks all the servers, adds them if needed, then sleeps for a certain amount of time
      */
     private synchronized void checkAllServers() {
         logger.info("thread ServersCheckThread is now checking proxy servers");
@@ -47,7 +47,8 @@ public class ServersCheckThread implements Runnable, DisposableBean {
         // then sleeps for a certain amount of time (checkServersTimeInterval variable)
         proxyServersManagerService.checkAllServers();
         try {
-            logger.info("thread ServersCheckThread finished checking is now waiting for " + checkServersTimeInterval + " millis");
+            logger.info("thread ServersCheckThread finished checking is now waiting for "
+                    + checkServersTimeInterval + " millis");
             wait(checkServersTimeInterval);
         } catch (InterruptedException e) {
             logger.error(e.getMessage());
