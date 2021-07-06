@@ -4,23 +4,25 @@ import com.dsr.proxy_server.data.enums.ProxyAnonymity;
 import com.dsr.proxy_server.data.enums.ProxyProtocol;
 
 import javax.validation.constraints.DecimalMin;
+import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.util.Objects;
 
 public class ProxyServerCreationDto {
 
-    @NotBlank
+    @NotBlank(message = "value ip cannot be null")
     private String ip;
-    @NotNull
+    @NotNull(message = "value port cannot be null")
     private Integer port;
-    @NotNull
+    @NotNull(message = "value type cannot be null")
     private ProxyProtocol type;
-    @NotBlank
+    @NotBlank(message = "value countryName cannot be null")
     private String countryName;
-    @NotNull
+    @NotNull(message = "value anonymity cannot be null")
     private ProxyAnonymity anonymity;
-    @NotNull
+    @NotNull(message = "value uptime cannot be null")
+    @Min(value = 0, message = "min value for the uptime is 0")
     private Double uptime;
 
     public ProxyAnonymity getAnonymity() {

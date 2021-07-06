@@ -22,6 +22,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
+
 import java.util.List;
 
 /**
@@ -66,7 +67,6 @@ public class ProxyServersManagerService {
                 ProxyServer proxyServer = proxyResultItemMapper.toEntity(proxyResultItem);
                 proxyServer.setSource(ProxySourceType.AUTO);
                 CountryResult countryResult = proxyResultItem.getCountry();
-                // TODO раскомментить
                 add(proxyServer, countryResult);
             }
         }
@@ -112,7 +112,7 @@ public class ProxyServersManagerService {
                 return new ProxyServerCreationResponseDto("Proxy server is unavailable");
             }
         } else {
-            return new ProxyServerCreationResponseDto("Proxy with given ip already exixts in the database");
+            return new ProxyServerCreationResponseDto("Proxy with given ip already exists in the database");
         }
     }
 

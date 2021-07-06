@@ -31,7 +31,7 @@ public class ProxyServersController {
     }
 
     @GetMapping("/")
-    public PageDto<ProxyServer> getAll(@RequestBody PageRequestDto pageRequest) {
+    public PageDto<ProxyServer> getAll(@Valid @RequestBody PageRequestDto pageRequest) {
         return proxyServersManagerService.getAll(pageRequest);
     }
 

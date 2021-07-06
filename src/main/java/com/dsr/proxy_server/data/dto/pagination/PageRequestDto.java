@@ -2,12 +2,19 @@ package com.dsr.proxy_server.data.dto.pagination;
 
 import org.springframework.data.domain.Sort;
 
+import javax.validation.constraints.Min;
+import javax.validation.constraints.NotNull;
 import java.util.Objects;
 
 public class PageRequestDto {
 
+    @NotNull(message = "value sort cannot be null")
     private Sort sort;
+    @NotNull(message = "value page cannot be null")
+    @Min(value = 1, message = "min value for page is 1")
     private Integer page;
+    @NotNull(message = "value itemsPerPage cannot be null")
+    @Min(value = 1, message = "min value for itemsPerPage is 1")
     private Integer itemsPerPage;
 
     public PageRequestDto(String sort, Integer page, Integer itemsPerPage) {

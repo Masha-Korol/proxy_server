@@ -13,16 +13,16 @@ import java.util.Objects;
  */
 public class ProxyServerRequest {
 
-    @NotBlank
+    @NotBlank(message = "value country cannot be null")
     private String country;
-    @NotNull
+    @NotNull(message = "value nethod cannot be null")
     private Method method;
-    @NotBlank
+    @NotBlank(message = "value url cannot be null")
     private String url;
-    @NotNull
+    @NotNull(message = "Value contentType cannot be null. If there's no content, then put 'NONE'")
     private ContentType contentType;
     private Object payload;
-    @NotNull
+    @NotNull(message = "value proxyProtocol cannot be null")
     private ProxyProtocol proxyProtocol;
 
     public ProxyProtocol getProxyProtocol() {

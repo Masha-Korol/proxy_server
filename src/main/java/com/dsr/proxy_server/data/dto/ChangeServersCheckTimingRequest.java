@@ -11,9 +11,10 @@ import java.util.Objects;
  */
 public class ChangeServersCheckTimingRequest {
 
-    @NotNull
+    @NotNull(message = "value timeUnit cannot be null")
     private TimeUnit timeUnit;
-    @Min(1)
+    @NotNull(message = "value interval cannot be null")
+    @Min(value = 1, message = "min value for the port is 1")
     private Integer interval;
 
     public TimeUnit getTimeUnit() {
