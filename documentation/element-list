@@ -13,4 +13,3 @@ com.dsr.proxy_server.repositories
 com.dsr.proxy_server.service
 com.dsr.proxy_server.sorting
 com.dsr.proxy_server.thread
-com.dsr.proxy_server.validator
